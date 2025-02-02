@@ -58,3 +58,23 @@ resource "aws_s3_bucket_policy" "nextjs_bucket_policy" {
   
 }
 
+# Origin Access Identity
+resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
+    comment = "OAI for Next.JS portfolio site"
+}
+
+# Cloudfron Distribution
+resource "aws_cloudfront_distribution" "nextjs_distribution" {
+    origin {
+      domain_name = aws_s3_bucket.nextjs_bucket.bucket_regional_domain_name
+      origin_id = "S3v-nextjs-portfolio-bucket"
+
+      s3_origin_config {
+        origin_access_identity = aws_cloudfront_origin_access_identity.origin_access_identity.cloudfront_access_identity_path
+        }
+    }
+  
+    enabled = true
+    is_ipv6_enabled = true
+    comment = "Next.js portfolio site"
+    default_root_object = "index.html"
